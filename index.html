@@ -3,23 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ali ELBOUHALI - Professional Portfolio showcasing software development, web design, and tech projects">
+    <meta name="keywords" content="Ali ELBOUHALI, software developer, web designer, tech enthusiast, finance and accounting portfolio, full stack developer, web development, programming, software engineering, tech projects">
+    <meta name="author" content="Ali ELBOUHALI">
+    <meta name="robots" content="index, follow">
     <title>Ali ELBOUHALI - portfolio</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    
 </head>
 <body>
     <header>
-        <h1>Welcome to My Portfolio :)</h1>
-        <ul>
-            <li>Software Developer</li>
-            <li>Web Designer</li>
-            <li>Tech Enthusiast</li>
-        </ul>
+        <img src="./images/logo.png" alt="">
+
+        <div class="drawer-bg">
+            <div class="drawer" id="drawer">
+                <ul>
+                    <li>About  me</li>
+                    <li>Resume</li>
+                    <li>Portfolio</li>
+                </ul>
+            </div>
+        </div>
+            <!-- Hamburger Icon -->
+        <div class="menu-btn" id="menu-btn" onclick="toggleDrawer()">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+        
     </header>
 
     <!-- 000 -->
+    <h4>Welcome to My Portfolio :)</h4>
      <div class="container">
-        <h2>Hello to my Portfolio</h2>
+        <div>
+            <img src="./images/me.jpg" alt="Profile Picture">
+            <h5>Born: May 26, 1998</h5>
+        </div>
+        <div>
+            <h2>Ali ELBOUHALI</h2>
+            <p>
+                Professional Bachelor's Degree (Bac+3) in Finance and Accounting.
+                <br><br>
+                I specialize in developing custom applications and websites, combining my financial background with technical expertise to create efficient digital solutions.
+            </p>
+        </div>        
      </div>
+
+     <!--  -->
+     <div class="skils">
+
+        <!-- WEB DEV -->
+        <div class="web" id="skils-div">
+            <img src="./images/web-dev.png" alt="">
+            <div>
+                <h3>Web Development</h3>
+                <p>Proficient in building responsive and dynamic websites using HTML, CSS, JavaScript, and backend technologies.</p>
+            </div>
+        </div>
+
+        <!-- APP DEV -->
+        <div class="app" id="skils-div">
+            <img src="./images/apps.png" alt="">
+            <div>
+                <h3>Application Development</h3>
+                <p>Experienced in developing cross-platform and native applications for mobile and desktop using modern frameworks.</p>
+            </div>
+        </div>
+
+
+        <!-- FINANCE -->
+        <div class="finance" id="skils-div">
+            <img src="./images/finance.png" alt="">
+            <div>
+                <h3>Financial Analysis</h3>
+                <p>Skilled in analyzing financial data, preparing reports, and providing insights to support business decisions.</p>
+            </div>
+        </div>
+
+        <!-- ACCOUNTING -->
+        <div class="accounting" id="skils-div">
+            <img src="./images/accounting.png" alt="">
+            <div>
+                <h3>Accounting Systems</h3>
+                <p>Knowledgeable in implementing and managing accounting software to streamline financial processes and ensure accuracy.</p>
+            </div>
+        </div>
+
+
+    </div>
+    <!--  -->
+
 </body>
+
+<!-- JavaScript -->
+<script src="js/script.js"></script>
+
+
+<!-- Footer -->
+ <footer>
+    <img src="./images/github.png" alt="">
+    <img src="./images/linkedin.png" alt="">
+    <img src="./images/twitter.png" alt="">
+    <img src="./images/instagram.png" alt="">
+    <img src="./images/whatsapp.png" alt="">
+
+    <p>© 2025 BohAli-Dev. All rights reserved.</p>
+ </footer>
 </html>
+
+
