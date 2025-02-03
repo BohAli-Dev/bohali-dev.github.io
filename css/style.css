@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'oswald';
-    src: url('..fonts/oswald.ttf') format('truetype');
+    src: url('../fonts/oswald.ttf') format('truetype');
 }
 
 body {
@@ -130,7 +130,7 @@ h4, h5, p {
     padding: 12px;
 }
 
-.skils h3, p{
+.skils h3, .skils p{
     text-align: left;
     padding: 0;
 }
