@@ -63,6 +63,7 @@ header img {
     justify-content: space-between;
     align-items: center;
     width: fit-centent;
+    margin-right: 17px;
 }
 
 .drawer ul {
