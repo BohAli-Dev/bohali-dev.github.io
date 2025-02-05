@@ -48,6 +48,14 @@ header img {
     .menu-btn.active .bar:nth-child(3) {
         transform: rotate(-45deg) translate(7px, -6px);
     }
+
+.drawer-bg {
+    width: 100%;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+}
+
 .drawer {
     background-color: #ebdfdf;
     color: black;
