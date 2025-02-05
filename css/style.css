@@ -200,7 +200,9 @@ footer p {
         position: absolute;
         right: 0;
     }
-
+    .drawer-bg {
+        margin-right: 0;
+    }
     .drawer {
         display: flex;
         transition: right 0.3s ease-in-out;
