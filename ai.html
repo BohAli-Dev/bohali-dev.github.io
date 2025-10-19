@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Puter Claude Chat – Streaming & Copy (Final)</title>
+<title>Puter Claude Chat – Fixed Version</title>
 
 <!-- Puter AI SDK -->
 <script src="https://js.puter.com/v2/"></script>
 
-<!-- Markdown + Syntax Highlight -->
+<!-- Markdown + Highlight.js (UMD build for global hljs) -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
-<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
 
 <style>
     body {
@@ -141,6 +141,7 @@ function renderMarkdownToHTML(text) {
     tempDiv.innerHTML = html;
 
     tempDiv.querySelectorAll('pre code').forEach(block => {
+        // FIX: hljs is now guaranteed to exist
         hljs.highlightElement(block);
         const pre = block.parentElement;
 
