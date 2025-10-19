@@ -3,8 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Puter Claude Chat – Enhanced Output (Fixed Copy)</title>
+<title>Puter Claude Chat – Streaming & Copy (Final)</title>
+
+<!-- Puter AI SDK -->
 <script src="https://js.puter.com/v2/"></script>
+
+<!-- Markdown + Syntax Highlight -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
 <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
@@ -15,7 +19,6 @@
         background-color: #0d1117;
         color: #e6edf3;
         margin: 0;
-        padding: 0;
         display: flex;
         flex-direction: column;
         height: 100vh;
@@ -84,7 +87,6 @@
     button:hover {
         background: #0097a7;
     }
-
     pre {
         background: #0d1117;
         border: 1px solid #30363d;
@@ -94,7 +96,6 @@
         position: relative;
         margin-top: 1rem;
     }
-
     .copy-btn {
         position: absolute;
         top: 8px;
@@ -108,11 +109,9 @@
         font-size: 0.8rem;
         display: none;
     }
-
     pre:hover .copy-btn {
         display: block;
     }
-
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
@@ -126,7 +125,7 @@
 <div id="chat-container"></div>
 
 <div id="input-area">
-    <textarea id="user-input" placeholder="Type your question..."></textarea>
+    <textarea id="user-input" placeholder="Type your question... (Press Enter to send)"></textarea>
     <button id="send-btn">Send</button>
 </div>
 
@@ -135,7 +134,7 @@ const chatContainer = document.getElementById('chat-container');
 const sendBtn = document.getElementById('send-btn');
 const userInput = document.getElementById('user-input');
 
-// Render Markdown + highlight + attach copy buttons
+// Render markdown and attach copy buttons
 function renderMarkdownToHTML(text) {
     const html = marked.parse(text);
     const tempDiv = document.createElement('div');
@@ -145,7 +144,6 @@ function renderMarkdownToHTML(text) {
         hljs.highlightElement(block);
         const pre = block.parentElement;
 
-        // Avoid duplicate buttons
         if (!pre.querySelector('.copy-btn')) {
             const copyBtn = document.createElement('button');
             copyBtn.className = 'copy-btn';
@@ -162,7 +160,6 @@ function renderMarkdownToHTML(text) {
     return tempDiv.innerHTML;
 }
 
-// Add message to chat
 function addMessage(content, sender) {
     const message = document.createElement('div');
     message.classList.add('message', sender);
@@ -172,7 +169,6 @@ function addMessage(content, sender) {
     return message;
 }
 
-// Main send logic
 async function sendMessage() {
     const query = userInput.value.trim();
     if (!query) return;
@@ -197,14 +193,17 @@ async function sendMessage() {
     }
 }
 
-// Event handlers
-sendBtn.addEventListener('click', sendMessage);
+// Enter key = stream send
 userInput.addEventListener('keypress', e => {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         sendMessage();
     }
 });
+
+// Button click also works
+sendBtn.addEventListener('click', sendMessage);
 </script>
+
 </body>
 </html>
