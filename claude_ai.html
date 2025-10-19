@@ -1,525 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">width=device-width, initial-scale=1.0">
-<title>Puter.js Claude AI Playground</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Puter Claude Chat – Enhanced Output</title>
 <script src="https://js.puter.com/v2/"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+
 <style>
-    * {
+    body {
+        font-family: "Segoe UI", sans-serif;
+        background-color: #0d1117;
+        color: #e6edf3;
         margin: 0;
         padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-        background-color: #f5f5f5;
-        color: #2d2d2d;
-        height: 100vh;
         display: flex;
         flex-direction: column;
+        height: 100vh;
     }
-
-    /* Header */
-    header {
-        background: #fff;
-        border-bottom: 1px solid #e5e5e5;
-        padding: 1rem 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    h1 {
+        text-align: center;
+        color: #00bcd4;
+        margin: 1rem 0;
     }
-
-    .logo {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #c96;
-    }
-
-    .model-selector {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .model-selector label {
-        font-size: 0.9rem;
-        color: #666;
-    }
-
-    select {
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
-        border-radius: 6px;
-        border: 1px solid #d1d1d1;
-        background: #fff;
-        color: #2d2d2d;
-        cursor: pointer;
-        outline: none;
-        transition: border 0.2s;
-    }
-
-    select:hover {
-        border-color: #c96;
-    }
-
-    /* Chat Container */
-    .chat-container {
+    #chat-container {
         flex: 1;
         overflow-y: auto;
-        padding: 2rem;
+        padding: 1rem;
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
-        max-width: 800px;
-        width: 100%;
+        gap: 1rem;
+        max-width: 900px;
         margin: 0 auto;
     }
-
-    /* Message Bubbles */
     .message {
+        background: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 10px;
+        padding: 1rem;
+        max-width: 90%;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        animation: fadeIn 0.3s ease;
+    }
+    .ai {
+        align-self: flex-start;
+        border-left: 4px solid #00bcd4;
+    }
+    .user {
+        align-self: flex-end;
+        background: #1e2329;
+        border-left: 4px solid #2ea043;
+    }
+    #input-area {
         display: flex;
-        gap: 1rem;
-        animation: fadeIn 0.3s ease-in;
+        gap: 0.5rem;
+        padding: 1rem;
+        background: #161b22;
+        border-top: 1px solid #30363d;
+    }
+    textarea {
+        flex: 1;
+        resize: none;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        background: #0d1117;
+        color: #e6edf3;
+        padding: 0.7rem;
+        font-size: 1rem;
+        height: 60px;
+    }
+    button {
+        background: #00bcd4;
+        color: #000;
+        border: none;
+        border-radius: 8px;
+        padding: 0 1.2rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    button:hover {
+        background: #0097a7;
+    }
+
+    pre {
+        background: #0d1117;
+        border: 1px solid #30363d;
+        padding: 1rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        position: relative;
+    }
+
+    .copy-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: #2ea043;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        padding: 4px 8px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        display: none;
+    }
+
+    pre:hover .copy-btn {
+        display: block;
     }
 
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
     }
-
-    .message.user {
-        flex-direction: row-reverse;
-    }
-
-    .avatar {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        flex-shrink: 0;
-    }
-
-    .message.user .avatar {
-        background: #c96;
-        color: white;
-    }
-
-    .message.assistant .avatar {
-        background: #e5e5e5;
-        color: #666;
-    }
-
-    .message-content {
-        background: #fff;
-        padding: 1rem 1.25rem;
-        border-radius: 12px;
-        max-width: 85%;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        line-height: 1.6;
-    }
-
-    .message.user .message-content {
-        background: #f0f0f0;
-    }
-
-    /* Markdown Styles */
-    .message-content h1,
-    .message-content h2,
-    .message-content h3 {
-        margin: 1rem 0 0.5rem;
-        color: #2d2d2d;
-    }
-
-    .message-content h1 { font-size: 1.5rem; }
-    .message-content h2 { font-size: 1.3rem; }
-    .message-content h3 { font-size: 1.1rem; }
-
-    .message-content p {
-        margin: 0.5rem 0;
-    }
-
-    .message-content ul, 
-    .message-content ol {
-        margin: 0.5rem 0 0.5rem 1.5rem;
-    }
-
-    .message-content li {
-        margin: 0.25rem 0;
-    }
-
-    .message-content code {
-        background: #f5f5f5;
-        color: #c96;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-family: 'Courier New', monospace;
-        font-size: 0.9em;
-    }
-
-    .message-content pre {
-        position: relative;
-        background: #2d2d2d;
-        color: #f5f5f5;
-        padding: 1rem;
-        border-radius: 8px;
-        overflow-x: auto;
-        margin: 1rem 0;
-    }
-
-    .message-content pre code {
-        background: transparent;
-        color: #f5f5f5;
-        padding: 0;
-        font-size: 0.9rem;
-    }
-
-    /* Copy Button for Code Blocks */
-    .code-block-wrapper {
-        position: relative;
-        margin: 1rem 0;
-    }
-
-    .copy-btn {
-        position: absolute;
-        top: 0.5rem;
-        right: 0.5rem;
-        background: #444;
-        color: #
-        padding: 0.4rem 0.8rem;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 0.8rem;
-        opacity: 0.7;
-        transition: opacity 0.2s, background 0.2s;
-    }
-
-    .copy-btn:hover {
-        opacity: 1;
-        background: #555;
-    }
-
-    .copy-btn.copied {
-        background: #4caf50;
-    }
-
-    /* Input Area */
-    .input-container {
-        background: #fff;
-        border-top: 1px solid #e5e5e5;
-        padding: 1.5rem 2rem;
-        box-shadow: 0 -1px 3px rgba(0,0,0,0.05);
-    }
-
-    .input-wrapper {
-        max-width: 800px;
-        margin: 0 auto;
-        position: relative;
-        display: flex;
-        gap: 0.5rem;
-        align-items: flex-end;
-    }
-
-    textarea {
-        flex: 1;
-        min-height: 52px;
-        max-height: 200px;
-        padding: 0.875rem 3.5rem 0.875rem 1rem;
-        font-size: 1rem;
-        border-radius: 12px;
-        border: 1px solid #d1d1d1;
-        background: #fff;
-        color: #2d2d2d;
-        resize: none;
-        outline: none;
-        font-family: inherit;
-        line-height: 1.5;
-        transition: border 0.2s;
-    }
-
-    textarea:focus {
-        border-color: #c96;
-    }
-
-    .send-btn {
-        position: absolute;
-        right: 0.75rem;
-        bottom: 0.75rem;
-        background: #c96;
-        color: white;
-        border: none;
-        width: 32px;
-        height: 32px;
-        border-radius: 6px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background 0.2s;
-    }
-
-    .send-btn:hover:not(:disabled) {
-        background: #b85;
-    }
-
-    .send-btn:disabled {
-        background: #ccc;
-        cursor: not-allowed;
-    } Loading Animation */
-    .typing-indicator {
-        display: flex;
-        gap: 4px;
-        padding: 1rem;
-    }
-
-    .typing-indicator span {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #999;
-        animation: typing 1.4s infinite;
-    }
-
-    .typing-indicator span:nth-child(2) {
-        animation-delay: 0.2s;
-    }
-
-    .typing-indicator span:nth-child(3) {
-        animation-delay: 0.4s;
-    }
-
-    @keyframes typing {
-        0%, 60%, 100% { transform: translateY(0); }
-        30% { transform: translateY(-10px); }
-    }
-
-    /* Scrollbar */
-    .chat-container::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    .chat-container::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .chat-container::-webkit-scrollbar-thumb {
-        background: #d1d1d1;
-        border-radius: 4px;
-    }
-
-    .chat-container::-webkit-scrollbar-thumb:hover {
-        background: #999;
-    }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        color: #999;
-        padding: 3rem 1rem;
-    }
-
-    .empty-state h2 {
-        font-size: 1.5rem;
-        margin-bottom: 0.5rem;
-        color: #666;
-    }
-
-    .empty-state p {
-        font-size: 1rem;
-    }
 </style>
 </head>
 <body>
 
-<header>
-    <div class="logo">Claude AI via Puter.js</div>
-    <div class="model-selector">
-        <label for="model">Model:</label>
-        <select id="model">
-            <option value="claude-sonnet-4">Claude Sonnet 4</option>
-            <option value="claude-opus-4">Claude Opus 4</option>
-            <option value="claude-opus-4-1">Claude Opus 4.1</option>
-            <option value="claude-sonnet-4-5">Claude Sonnet 4.5</option>
-            <option value="claude-3-7-sonnet">Claude 3.7 Sonnet</option>
-            <option value="claude-3-7-opus">Claude 3.7 Opus</option>
-        </select>
-    </div>
-</header>
+<h1>Claude AI via Puter.js</h1>
 
-<div class="chat-container" id="chatContainer">
-    <div class="empty-state">
-        <h2>Welcome to Claude AI</h2>
-        <p>Start a conversation by typing a message below</p>
-    </div>
-</div>
+<div id="chat-container"></div>
 
-<div class="input-container">
-    <div class="input-wrapper">
-        <textarea 
-            id="prompt" 
-            placeholder="Message Claude..." 
-            rows="1"
-        ></textarea>
-        <button class="send-btn" id="sendBtn">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M14.5 1.5L7 9M14.5 1.5L10 14.5L7 9M14.5 1.5L1.5 6L7 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </button>
-    </div>
+<div id="input-area">
+    <textarea id="user-input" placeholder="Type your question..."></textarea>
+    <button id="send-btn">Send</button>
 </div>
 
 <script>
-const promptEl = document.getElementById('prompt');
-const modelEl = document.getElementById('model');
-const chatContainer = document.getElementById('chatContainer');
-const sendBtn = document.getElementById('sendBtn');
+const chatContainer = document.getElementById('chat-container');
+const sendBtn = document.getElementById('send-btn');
+const userInput = document.getElementById('user-input');
 
-// Auto-resize textarea
-promptEl.addEventListener('input', function() {
-    this.style.height = 'auto';
-    this.style.height = Math.min(this.scrollHeight, 200) + 'px';
-});
+// Markdown rendering with syntax highlighting
+function renderMarkdownToHTML(text) {
+    const html = marked.parse(text);
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
 
-// Configure marked for better code rendering
-marked.setOptions({
-    highlight: function(code, lang) {
-        return code;
-    },
-    breaks: true
-});
-
-// Render markdown with code block wrappers
-function renderMarkdown(text) {
-    let html = marked.parse(text);
-    
-    // Wrap code blocks with copy button
-    html = html.replace(/<pre><code(.*?)>([\s\S]*?)<\/code><\/pre>/g, function(match, attrs, code) {
-        const lang = attrs.match(/class="language-(\w+)"/);
-        const language = lang ? lang[1] : '';
-        return `
-            <div class="code-block-wrapper">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                <pre><code${attrs}>${code}</code></pre>
-            </div>
-        `;
+    // Highlight code blocks and add copy button
+    tempDiv.querySelectorAll('pre code').forEach((block) => {
+        hljs.highlightElement(block);
+        const pre = block.parentElement;
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.textContent = 'Copy';
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(block.textContent);
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => copyBtn.textContent = 'Copy', 1500);
+        };
+        pre.appendChild(copyBtn);
     });
-    
-    return html;
+
+    return tempDiv.innerHTML;
 }
 
-// Copy code function
-window.copyCode = function(btn) {
-    const codeBlock = btn.nextElementSibling.querySelector('code');
-    const text = codeBlock.textContent;
-    
-    navigator.clipboard.writeText(text).then(() => {
-        btn.textContent = 'Copied!';
-        btn.classList.add('copied');
-        setTimeout(() => {
-            btn.textContent = 'Copy';
-            btn.classList.remove('copied');
-        }, 2000);
-    });
-}
-
-// Add message to chat
-function addMessage(role, content, isStreaming = false) {
-    // Remove empty state if exists
-    const emptyState = chatContainer.querySelector('.empty-state');
-    if (emptyState) {
-        emptyState.remove();
-    }
-
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${role}`;
-    
-    const avatar = document.createElement('div');
-    avatar.className = 'avatar';
-    avatar.textContent = role === 'user' ? 'U' : 'AI';
-    
-    const messageContent = document.createElement('div');
-    messageContent.className = 'message-content';
-    
-    if (role === 'user') {
-        messageContent.textContent = content;
-    } else if (isStreaming) {
-        messageContent.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
-    } else {
-        messageContent.innerHTML = renderMarkdown(content);
-    }
-    
-    messageDiv.appendChild(avatar);
-    messageDiv.appendChild(messageContent);
-    chatContainer.appendChild(messageDiv);
-    
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-    
-    return messageContent;
-}
-
-// Update streaming message
-function updateMessage(messageContent, text) {
-    messageContent.innerHTML = renderMarkdown(text);
+// Add message to chat container
+function addMessage(content, sender) {
+    const message = document.createElement('div');
+    message.classList.add('message', sender);
+    message.innerHTML = renderMarkdownToHTML(content);
+    chatContainer.appendChild(message);
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-// Send message
+// Send user message and get AI response
 async function sendMessage() {
-    const query = promptEl.value.trim();
+    const query = userInput.value.trim();
     if (!query) return;
-    
-    const model = modelEl.value;
-    
-    // Add user message
-    addMessage('user', query);
-    
-    // Clear input
-    promptEl.value = '';
-    promptEl.style.height = 'auto';
-    
-    // Disable send button
-    sendBtn.disabled = true;
-    
-    // Add assistant message with typing indicator
-    const assistantMessage = addMessage('assistant', '', true);
-    
-    let collected = "";
-    
+
+    addMessage(query, 'user');
+    userInput.value = '';
+
+    const aiMessage = document.createElement('div');
+    aiMessage.classList.add('message', 'ai');
+    aiMessage.innerHTML = "<em>Thinking...</em>";
+    chatContainer.appendChild(aiMessage);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
     try {
-        const stream = await puter.ai.chat(query, { model: model, stream: true });
-        
-        for await (const chunk of stream) {
-            if (chunk?.text) {
-                collected += chunk.text;
-                updateMessage(assistantMessage, collected);
+        const stream = await puter.ai.chat(query, { model: 'claude-opus-4', stream: true });
+        let fullText = '';
+        for await (const part of stream) {
+            if (part?.text) {
+                fullText += part.text;
+                aiMessage.innerHTML = renderMarkdownToHTML(fullText);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
             }
         }
     } catch (err) {
-        assistantMessage.innerHTML = `<p style="color: #d32f2f;">Error: ${err.message}</p>`;
-    } finally {
-        sendBtn.disabled = false;
-        promptEl.focus();
+        aiMessage.innerHTML = `<span style="color:red;">Error: ${err.message}</span>`;
     }
 }
 
-// Event listeners
+// Handle send button
 sendBtn.addEventListener('click', sendMessage);
-
-promptEl.addEventListener('keydown', (e) => {
+userInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         sendMessage();
     }
 });
-
-// Focus on input on load
-promptEl.focus();
 </script>
-
 </body>
 </html>
