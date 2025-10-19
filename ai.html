@@ -191,13 +191,14 @@
         top: 0.5rem;
         right: 0.5rem;
         background: #444;
-        color: #
+        color: #fff;
         padding: 0.4rem 0.8rem;
         border-radius: 4px;
         cursor: pointer;
         font-size: 0.8rem;
         opacity: 0.7;
         transition: opacity 0.2s, background 0.2s;
+        border: none;
     }
 
     .copy-btn:hover {
@@ -271,7 +272,9 @@
     .send-btn:disabled {
         background: #ccc;
         cursor: not-allowed;
-    } Loading Animation */
+    }
+
+    /* Loading Animation */
     .typing-indicator {
         display: flex;
         gap: 4px;
@@ -361,14 +364,11 @@
 
 <div class="input-container">
     <div class="input-wrapper">
-        <textarea 
-            id="prompt" 
-            placeholder="Message Claude..." 
-            rows="1"
-        ></textarea>
+        <textarea id="prompt" placeholder="Message Claude..." rows="1"></textarea>
         <button class="send-btn" id="sendBtn">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M14.5 1.5L7 9M14.5 1.5L10 14.5L7 9M14.5 1.5L1.5 6L7 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M14.5 1.5L7 9M14.5 1.5L10 14.5L7 9M14.5 1.5L1.5 6L7 9"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </button>
     </div>
@@ -386,22 +386,18 @@ promptEl.addEventListener('input', function() {
     this.style.height = Math.min(this.scrollHeight, 200) + 'px';
 });
 
-// Configure marked for better code rendering
+// Configure marked for markdown rendering
 marked.setOptions({
-    highlight: function(code, lang) {
+    highlight: function(code) {
         return code;
     },
     breaks: true
 });
 
-// Render markdown with code block wrappers
+// Render markdown and wrap code blocks
 function renderMarkdown(text) {
     let html = marked.parse(text);
-    
-    // Wrap code blocks with copy button
-    html = html.replace(/<pre><code(.*?)>([\s\S]*?)<\/code><\/pre>/g, function(match, attrs, code) {
-        const lang = attrs.match(/class="language-(\w+)"/);
-        const language = lang ? lang[1] : '';
+    html = html.replace(/<pre><code(.*?)>([\s\S]*?)<\/code><\/pre>/g, (match, attrs, code) => {
         return `
             <div class="code-block-wrapper">
                 <button class="copy-btn" onclick="copyCode(this)">Copy</button>
@@ -409,7 +405,6 @@ function renderMarkdown(text) {
             </div>
         `;
     });
-    
     return html;
 }
 
@@ -417,7 +412,6 @@ function renderMarkdown(text) {
 window.copyCode = function(btn) {
     const codeBlock = btn.nextElementSibling.querySelector('code');
     const text = codeBlock.textContent;
-    
     navigator.clipboard.writeText(text).then(() => {
         btn.textContent = 'Copied!';
         btn.classList.add('copied');
@@ -426,44 +420,33 @@ window.copyCode = function(btn) {
             btn.classList.remove('copied');
         }, 2000);
     });
-}
+};
 
 // Add message to chat
 function addMessage(role, content, isStreaming = false) {
-    // Remove empty state if exists
     const emptyState = chatContainer.querySelector('.empty-state');
-    if (emptyState) {
-        emptyState.remove();
-    }
+    if (emptyState) emptyState.remove();
 
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${role}`;
-    
+
     const avatar = document.createElement('div');
     avatar.className = 'avatar';
     avatar.textContent = role === 'user' ? 'U' : 'AI';
-    
+
     const messageContent = document.createElement('div');
     messageContent.className = 'message-content';
-    
-    if (role === 'user') {
-        messageContent.textContent = content;
-    } else if (isStreaming) {
-        messageContent.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
-    } else {
-        messageContent.innerHTML = renderMarkdown(content);
-    }
-    
-    messageDiv.appendChild(avatar);
-    messageDiv.appendChild(messageContent);
+    messageContent.innerHTML = isStreaming
+        ? '<div class="typing-indicator"><span></span><span></span><span></span></div>'
+        : (role === 'user' ? content : renderMarkdown(content));
+
+    messageDiv.append(avatar, messageContent);
     chatContainer.appendChild(messageDiv);
-    
     chatContainer.scrollTop = chatContainer.scrollHeight;
-    
     return messageContent;
 }
 
-// Update streaming message
+// Update streaming text
 function updateMessage(messageContent, text) {
     messageContent.innerHTML = renderMarkdown(text);
     chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -473,27 +456,18 @@ function updateMessage(messageContent, text) {
 async function sendMessage() {
     const query = promptEl.value.trim();
     if (!query) return;
-    
+
     const model = modelEl.value;
-    
-    // Add user message
     addMessage('user', query);
-    
-    // Clear input
     promptEl.value = '';
     promptEl.style.height = 'auto';
-    
-    // Disable send button
     sendBtn.disabled = true;
-    
-    // Add assistant message with typing indicator
+
     const assistantMessage = addMessage('assistant', '', true);
-    
     let collected = "";
-    
+
     try {
-        const stream = await puter.ai.chat(query, { model: model, stream: true });
-        
+        const stream = await puter.ai.chat(query, { model, stream: true });
         for await (const chunk of stream) {
             if (chunk?.text) {
                 collected += chunk.text;
@@ -508,9 +482,8 @@ async function sendMessage() {
     }
 }
 
-// Event listeners
+// Listeners
 sendBtn.addEventListener('click', sendMessage);
-
 promptEl.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
@@ -518,9 +491,7 @@ promptEl.addEventListener('keydown', (e) => {
     }
 });
 
-// Focus on input on load
 promptEl.focus();
 </script>
-
 </body>
 </html>
