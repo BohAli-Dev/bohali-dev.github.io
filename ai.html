@@ -3,15 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Puter Claude Chat – Fixed Version</title>
-
-<!-- Puter AI SDK -->
+<title>Puter Claude Chat – Enhanced Output</title>
 <script src="https://js.puter.com/v2/"></script>
-
-<!-- Markdown + Highlight.js (UMD build for global hljs) -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
-<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
 
 <style>
     body {
@@ -19,6 +15,7 @@
         background-color: #0d1117;
         color: #e6edf3;
         margin: 0;
+        padding: 0;
         display: flex;
         flex-direction: column;
         height: 100vh;
@@ -87,6 +84,7 @@
     button:hover {
         background: #0097a7;
     }
+
     pre {
         background: #0d1117;
         border: 1px solid #30363d;
@@ -94,8 +92,8 @@
         border-radius: 8px;
         overflow-x: auto;
         position: relative;
-        margin-top: 1rem;
     }
+
     .copy-btn {
         position: absolute;
         top: 8px;
@@ -109,9 +107,11 @@
         font-size: 0.8rem;
         display: none;
     }
+
     pre:hover .copy-btn {
         display: block;
     }
+
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
@@ -125,7 +125,7 @@
 <div id="chat-container"></div>
 
 <div id="input-area">
-    <textarea id="user-input" placeholder="Type your question... (Press Enter to send)"></textarea>
+    <textarea id="user-input" placeholder="Type your question..."></textarea>
     <button id="send-btn">Send</button>
 </div>
 
@@ -134,42 +134,40 @@ const chatContainer = document.getElementById('chat-container');
 const sendBtn = document.getElementById('send-btn');
 const userInput = document.getElementById('user-input');
 
-// Render markdown and attach copy buttons
+// Markdown rendering with syntax highlighting
 function renderMarkdownToHTML(text) {
     const html = marked.parse(text);
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = html;
 
-    tempDiv.querySelectorAll('pre code').forEach(block => {
-        // FIX: hljs is now guaranteed to exist
+    // Highlight code blocks and add copy button
+    tempDiv.querySelectorAll('pre code').forEach((block) => {
         hljs.highlightElement(block);
         const pre = block.parentElement;
-
-        if (!pre.querySelector('.copy-btn')) {
-            const copyBtn = document.createElement('button');
-            copyBtn.className = 'copy-btn';
-            copyBtn.textContent = 'Copy';
-            copyBtn.addEventListener('click', () => {
-                navigator.clipboard.writeText(block.textContent);
-                copyBtn.textContent = 'Copied!';
-                setTimeout(() => (copyBtn.textContent = 'Copy'), 1500);
-            });
-            pre.appendChild(copyBtn);
-        }
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.textContent = 'Copy';
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(block.textContent);
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => copyBtn.textContent = 'Copy', 1500);
+        };
+        pre.appendChild(copyBtn);
     });
 
     return tempDiv.innerHTML;
 }
 
+// Add message to chat container
 function addMessage(content, sender) {
     const message = document.createElement('div');
     message.classList.add('message', sender);
     message.innerHTML = renderMarkdownToHTML(content);
     chatContainer.appendChild(message);
     chatContainer.scrollTop = chatContainer.scrollHeight;
-    return message;
 }
 
+// Send user message and get AI response
 async function sendMessage() {
     const query = userInput.value.trim();
     if (!query) return;
@@ -177,7 +175,11 @@ async function sendMessage() {
     addMessage(query, 'user');
     userInput.value = '';
 
-    const aiMessage = addMessage("<em>Thinking...</em>", 'ai');
+    const aiMessage = document.createElement('div');
+    aiMessage.classList.add('message', 'ai');
+    aiMessage.innerHTML = "<em>Thinking...</em>";
+    chatContainer.appendChild(aiMessage);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
 
     try {
         const stream = await puter.ai.chat(query, { model: 'claude-opus-4', stream: true });
@@ -194,17 +196,14 @@ async function sendMessage() {
     }
 }
 
-// Enter key = stream send
-userInput.addEventListener('keypress', e => {
+// Handle send button
+sendBtn.addEventListener('click', sendMessage);
+userInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         sendMessage();
     }
 });
-
-// Button click also works
-sendBtn.addEventListener('click', sendMessage);
 </script>
-
 </body>
 </html>
