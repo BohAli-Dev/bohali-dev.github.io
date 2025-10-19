@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Puter Claude Chat – Enhanced Output</title>
+<title>Puter Claude Chat – Enhanced Output (Fixed Copy)</title>
 <script src="https://js.puter.com/v2/"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
@@ -92,6 +92,7 @@
         border-radius: 8px;
         overflow-x: auto;
         position: relative;
+        margin-top: 1rem;
     }
 
     .copy-btn {
@@ -134,40 +135,44 @@ const chatContainer = document.getElementById('chat-container');
 const sendBtn = document.getElementById('send-btn');
 const userInput = document.getElementById('user-input');
 
-// Markdown rendering with syntax highlighting
+// Render Markdown + highlight + attach copy buttons
 function renderMarkdownToHTML(text) {
     const html = marked.parse(text);
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = html;
 
-    // Highlight code blocks and add copy button
-    tempDiv.querySelectorAll('pre code').forEach((block) => {
+    tempDiv.querySelectorAll('pre code').forEach(block => {
         hljs.highlightElement(block);
         const pre = block.parentElement;
-        const copyBtn = document.createElement('button');
-        copyBtn.className = 'copy-btn';
-        copyBtn.textContent = 'Copy';
-        copyBtn.onclick = () => {
-            navigator.clipboard.writeText(block.textContent);
-            copyBtn.textContent = 'Copied!';
-            setTimeout(() => copyBtn.textContent = 'Copy', 1500);
-        };
-        pre.appendChild(copyBtn);
+
+        // Avoid duplicate buttons
+        if (!pre.querySelector('.copy-btn')) {
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.textContent = 'Copy';
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(block.textContent);
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => (copyBtn.textContent = 'Copy'), 1500);
+            });
+            pre.appendChild(copyBtn);
+        }
     });
 
     return tempDiv.innerHTML;
 }
 
-// Add message to chat container
+// Add message to chat
 function addMessage(content, sender) {
     const message = document.createElement('div');
     message.classList.add('message', sender);
     message.innerHTML = renderMarkdownToHTML(content);
     chatContainer.appendChild(message);
     chatContainer.scrollTop = chatContainer.scrollHeight;
+    return message;
 }
 
-// Send user message and get AI response
+// Main send logic
 async function sendMessage() {
     const query = userInput.value.trim();
     if (!query) return;
@@ -175,11 +180,7 @@ async function sendMessage() {
     addMessage(query, 'user');
     userInput.value = '';
 
-    const aiMessage = document.createElement('div');
-    aiMessage.classList.add('message', 'ai');
-    aiMessage.innerHTML = "<em>Thinking...</em>";
-    chatContainer.appendChild(aiMessage);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+    const aiMessage = addMessage("<em>Thinking...</em>", 'ai');
 
     try {
         const stream = await puter.ai.chat(query, { model: 'claude-opus-4', stream: true });
@@ -196,9 +197,9 @@ async function sendMessage() {
     }
 }
 
-// Handle send button
+// Event handlers
 sendBtn.addEventListener('click', sendMessage);
-userInput.addEventListener('keypress', (e) => {
+userInput.addEventListener('keypress', e => {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         sendMessage();
